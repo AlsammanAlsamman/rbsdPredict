@@ -6,7 +6,7 @@ library(rstatix)
 # Boxplot by cluster
 plot_boxplot_clusters <- function(data) {
   data_melted <- melt(data, id.vars = "cluster", measure.vars = c("tmax", "tmin", "RH"))
-  ggplot(data_melted, aes(x = .data$variable, y = .data$value, fill = .data$variable)) +
+  ggplot(data_melted, aes(x = .data$variable, y = .data$value, fill = as.factor(.data$cluster))) +
     geom_boxplot() +
     facet_wrap(~.data$cluster) +
     theme_minimal()

@@ -2,36 +2,34 @@
 library(randomForest)
 library(stats)
 
-# Example: Hybrid prediction using cluster-specific regression equations
-predict_a_cluster1 <- function(tmax, tmin, rh) {
-  37.41 + (-1.07 * tmax) + (0.98 * tmin) + (-0.1 * rh)
-}
-predict_pdi_cluster1 <- function(tmax, tmin, rh) {
-  10.08 + (0.05 * tmax) + (-1.8 * tmin) + (0.21 * rh)
-}
-predict_a_cluster2 <- function(tmax, tmin, rh) {
-  66.57 + (-0.95 * tmax) + (-0.87 * tmin) + (0.05 * rh)
-}
-predict_pdi_cluster2 <- function(tmax, tmin, rh) {
-  -32.11 + (0.22 * tmax) + (0.49 * tmin) + (0.06 * rh)
-}
-predict_a_cluster3 <- function(tmax, tmin, rh) {
-  -24.91 + (-0.16 * tmax) + (0.62 * tmin) + (0.51 * rh)
-}
-predict_pdi_cluster3 <- function(tmax, tmin, rh) {
-  21.9 + (-0.59 * tmax) + (1.13 * tmin) + (-0.49 * rh)
-}
+# Store model coefficients in lists for easier management
+# Format: (Intercept), tmax, tmin, rh
+a_model_coeffs <- list(
+  "1" = c(37.41, -1.07, 0.98, -0.10),
+  "2" = c(66.57, -0.95, -0.87, 0.05),
+  "3" = c(-24.91, -0.16, 0.62, 0.51)
+)
 
-# Select prediction function by cluster
-predict_a <- function(cluster, tmax, tmin, rh) {
-  if (cluster == 1) predict_a_cluster1(tmax, tmin, rh)
-  else if (cluster == 2) predict_a_cluster2(tmax, tmin, rh)
-  else if (cluster == 3) predict_a_cluster3(tmax, tmin, rh)
-  else stop("Invalid cluster number")
-}
-predict_pdi <- function(cluster, tmax, tmin, rh) {
-  if (cluster == 1) predict_pdi_cluster1(tmax, tmin, rh)
-  else if (cluster == 2) predict_pdi_cluster2(tmax, tmin, rh)
-  else if (cluster == 3) predict_pdi_cluster3(tmax, tmin, rh)
-  else stop("Invalid cluster number")
+pdi_model_coeffs <- list(
+  "1" = c(10.08, 0.05, -1.80, 0.21),
+  "2" = c(-32.11, 0.22, 0.49, 0.06),
+  "3" = c(21.90, -0.59, 1.13, -0.49)
+)
+
+#' Generic prediction function for hybrid models
+#'
+#' @param cluster The cluster number.
+#' @param tmax Maximum temperature.
+#' @param tmin Minimum temperature.
+#' @param rh Relative humidity.
+#' @param model_coeffs A list of coefficient vectors, named by cluster.
+#' @return A numeric prediction.
+predict_hybrid <- function(cluster, tmax, tmin, rh, model_coeffs) {
+  cluster_char <- as.character(cluster)
+  if (!cluster_char %in% names(model_coeffs)) {
+    stop("Invalid cluster number: ", cluster)
+  }
+  coeffs <- model_coeffs[[cluster_char]]
+  prediction <- coeffs[1] + (coeffs[2] * tmax) + (coeffs[3] * tmin) + (coeffs[4] * rh)
+  return(prediction)
 }
