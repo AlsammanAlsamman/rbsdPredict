@@ -1,62 +1,63 @@
-# rbsdPredict: Weather-Driven Epidemiology of Rice Brown Spot Disease
+# rbsdPredict: AI-Driven Rice Brown Spot Disease Forecasting
 
 ## Overview
-`rbsdPredict` is an R package for modeling, predicting, and visualizing the spatio-temporal risk of Rice Brown Spot Disease (RBSD) in India. It leverages AI/ML approaches and hierarchical clustering to analyze field and climate scenario data, supporting early warning and risk mapping for rice disease outbreaks.
+`rbsdPredict` is an open-source R package developed as part of the research article:
+
+**Integrating Artificial Intelligence and Climate Data for Predicting Rice Brown Spot Disease Dynamics**  
+Sudhasha Selvaraj, Alsamman M. Alsamman, Tuyen V. Ha, Shalini Gakhar, Suresh Kumar S. Monikandan, Ajit Govind*  
+Rice Research Station, Tamil Nadu Agricultural University, India  
+International Center for Agricultural Research in the Dry Areas, Lebanon  
+International Rice Research Institute, Philippines  
+Faculty of Resources Management, Thai Nguyen University of Agriculture and Forestry, Vietnam  
+Correspondence: Ajit Govind, a.govind@cgiar.org
+
+## Abstract
+Rice Brown Spot Disease (RBSD), caused by Bipolaris oryzae, has historically triggered major famines in India. This package implements predictive models for RBSD using AI/ML approaches, leveraging multi-year field and climate data. It enables robust forecasting of both aerospora concentration and disease intensity (PDI) using meteorological variables, and applies these models to gridded climate data under IPCC scenarios to map spatio-temporal risk across Eastern India. The package empowers stakeholders with actionable intelligence for early warning and hotspot identification, supporting food security under climate change.
 
 ## Features
-- Data processing and cleaning utilities
-- Clustering and classification of environmental data
-- Machine learning models (linear regression, random forest, SVM)
-- Hybrid modeling with cluster-specific regression equations
-- Prediction functions for disease intensity and aerospora concentration
-- Visualization tools for boxplots, scatterplots, and risk maps
-- Ready-to-use datasets (`rbsd_data`, `climate_scenarios`)
+- Data preprocessing and cleaning utilities
+- Hierarchical clustering of environmental data
+- Machine learning models (linear regression, random forest, neural networks, etc.)
+- Hybrid modeling combining clustering and regression
+- Prediction functions for aerospora concentration and disease intensity
+- Visualization tools for risk maps, boxplots, and actual vs predicted plots
+- Ready-to-use datasets (`rbsd_data`)
 
 ## Installation
-Clone the repository and use `devtools` to install:
 ```r
 # Install devtools if needed
 install.packages("devtools")
 devtools::install_local("/path/to/rbsdPredict")
 ```
 
-## Usage
+## Usage Example
 ```r
 library(rbsdPredict)
+
 # Load the main dataset
 data(rbsd_data)
-head(rbsd_data)
 
-# Run clustering and prediction
-clustered <- data_predict_clusters(rbsd_data)
-predicted <- predict_a_pdi(clustered)
+# Preprocess the data
+processed <- preprocess_data(rbsd_data)
 
-# Visualize results
-plot_boxplot_clusters(clustered)
-plots <- plot_actual_vs_predicted(predicted)
-print(plots$A_plot)
-print(plots$PDI_plot)
+# Train machine learning models
+ml_models <- train_ml_models(processed, models = c("lm", "rf", "xgbTree", "knn", "nnet"))
 
-# Plot risk map (example)
-# plot_risk_map(climate_scenarios, trained_model)
+# Predict RBSD for test features (type can be "A" or "PDI")
+predictions_A <- predict_rbsd(ml_models, processed$test_features, "A")
+predictions_PDI <- predict_rbsd(ml_models, processed$test_features, "PDI")
+
+# Print predictions
+print(predictions_A)
+print(predictions_PDI)
 ```
 
 ## Data Sources
-- **Field Data**: Collected from multi-year epidemiological studies in Southern India.
-- **Climate Scenarios**: Derived from IPCC projections and regional meteorological data.
-- **Reference**: Modelling and Scaling Weather-Driven Epidemiology of Rice Brown Spot Disease in Peninsular India (Sudhasha Selvaraj et al.)
+- **Field Data**: Multi-year epidemiological studies in Southern India
+- **Climate Scenarios**: IPCC projections and regional meteorological data
 
-## Authors
-- Sudhasha Selvaraj
-- Alsamman M. Alsamman
-- Tuyen V. Ha
-- Shalini Gakhar
-- Suresh Kumar S. Monikandan
-- Ajit Govind (Corresponding: a.govind@cgiar.org)
+## Citation
+If you use this package, please cite the article above.
 
 ## License
 See `LICENSE` file for details.
-
-## Citation
-If you use this package, please cite:
-> Sudhasha Selvaraj, Alsamman M. Alsamman, Tuyen V. Ha, Shalini Gakhar, Suresh Kumar S. Monikandan, Ajit Govind. Modelling and Scaling Weather-Driven Epidemiology of Rice Brown Spot Disease in Peninsular India.
