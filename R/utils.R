@@ -1,3 +1,8 @@
+# Silence R CMD check notes for NSE symbols used in ggplot2 aesthetics.
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c("cluster", "xmin", "xmax", "x", "y", "xend", "yend"))
+}
+
 #' Print Method for rbsd_cluster Objects
 #'
 #' @param x An object of class "rbsd_cluster"

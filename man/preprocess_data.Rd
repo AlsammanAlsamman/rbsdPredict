@@ -4,7 +4,13 @@
 \alias{preprocess_data}
 \title{Preprocess Data for RBSD Prediction}
 \usage{
-preprocess_data(data, handle_missing = "impute", normalize = TRUE, seed = 123)
+preprocess_data(
+	data,
+	handle_missing = "impute",
+	normalize = TRUE,
+	normalize_targets = FALSE,
+	seed = 123
+)
 }
 \arguments{
 \item{data}{A data frame containing environmental variables and disease indicators}
@@ -12,6 +18,8 @@ preprocess_data(data, handle_missing = "impute", normalize = TRUE, seed = 123)
 \item{handle_missing}{Method to handle missing values ("impute" or "remove")}
 
 \item{normalize}{Whether to normalize features (default: TRUE)}
+
+\item{normalize_targets}{Whether to normalize target columns A and PDI (default: FALSE)}
 
 \item{seed}{Random seed for reproducibility (default: 123)}
 }

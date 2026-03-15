@@ -7,13 +7,15 @@
 #' @param data A data frame containing environmental variables and disease indicators
 #' @param handle_missing Method to handle missing values ("impute" or "remove")
 #' @param normalize Whether to normalize features (default: TRUE)
+#' @param normalize_targets Whether to normalize target columns A and PDI (default: FALSE)
 #' @param seed Random seed for reproducibility (default: 123)
 #' @return A list containing processed data and preprocessing parameters
 #' @examples
 #' data(rbsd_data)
 #' processed <- preprocess_data(rbsd_data)
 #' @export
-preprocess_data <- function(data, handle_missing = "impute", normalize = TRUE, seed = 123) {
+preprocess_data <- function(data, handle_missing = "impute", normalize = TRUE,
+                            normalize_targets = FALSE, seed = 123) {
   
   # Validate input
   if (!is.data.frame(data)) {
@@ -46,15 +48,26 @@ preprocess_data <- function(data, handle_missing = "impute", normalize = TRUE, s
   
   # Normalize features if requested
   if (normalize) {
-    # Identify numeric columns (excluding potential target variables)
-    numeric_cols <- sapply(processed_data, is.numeric)
+    feature_cols <- c("tmax", "tmin", "RH", "RF", "PET", "WS")
+    target_cols <- c("A", "PDI")
+    columns_to_scale <- intersect(feature_cols, colnames(processed_data))
+
+    # Fallback for generic tabular data.
+    if (length(columns_to_scale) == 0) {
+      columns_to_scale <- names(processed_data)[sapply(processed_data, is.numeric)]
+    }
+
+    if (normalize_targets) {
+      columns_to_scale <- unique(c(columns_to_scale, intersect(target_cols, colnames(processed_data))))
+    }
     
     # Calculate normalization parameters
-    prep_params$means <- colMeans(processed_data[, numeric_cols], na.rm = TRUE)
-    prep_params$sds <- apply(processed_data[, numeric_cols], 2, sd, na.rm = TRUE)
+    prep_params$scaled_columns <- columns_to_scale
+    prep_params$means <- colMeans(processed_data[, columns_to_scale, drop = FALSE], na.rm = TRUE)
+    prep_params$sds <- apply(processed_data[, columns_to_scale, drop = FALSE], 2, sd, na.rm = TRUE)
     
     # Apply normalization
-    processed_data[, numeric_cols] <- scale(processed_data[, numeric_cols])
+    processed_data[, columns_to_scale] <- scale(processed_data[, columns_to_scale, drop = FALSE])
   }
   
   # Split data into features and targets
@@ -65,7 +78,7 @@ preprocess_data <- function(data, handle_missing = "impute", normalize = TRUE, s
   targets <- processed_data[, intersect(target_cols, colnames(processed_data)), drop = FALSE]
   
   # Create train-test split
-  train_indices <- sample(1:nrow(processed_data), size = floor(0.8 * nrow(processed_data)))
+  train_indices <- sample(seq_len(nrow(processed_data)), size = floor(0.8 * nrow(processed_data)))
   
   train_features <- features[train_indices, , drop = FALSE]
   test_features <- features[-train_indices, , drop = FALSE]
@@ -80,6 +93,7 @@ preprocess_data <- function(data, handle_missing = "impute", normalize = TRUE, s
     test_targets = test_targets,
     prep_params = prep_params,
     normalize = normalize,
+    normalize_targets = normalize_targets,
     handle_missing = handle_missing
   )
   

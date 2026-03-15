@@ -1,21 +1,27 @@
 Package: rbsdPredict
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Predict Rice Brown Spot Disease from Climate Drivers
 Version: 0.1.0
 Authors@R: c(
     person(
-      "Jane", "Doe",
-      email = "jane@example.com",
+      "Alsamman", "M. Alsamman",
+      email = "a.govind@cgiar.org",
       role = c("aut", "cre")
     )
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
-License: What license is it under?
+Description: End-to-end workflows for modeling and forecasting rice brown spot
+    disease (RBSD) using meteorological predictors. The package supports data
+    preprocessing, hierarchical clustering of climate regimes, machine learning
+    model training, cluster-wise hybrid regression, prediction, risk mapping,
+    model ranking, and climate scenario simulation.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.3
 Imports:
     caret,
     Metrics,
-    randomForest
+    randomForest,
+    ggplot2,
+    reshape2,
+    rlang

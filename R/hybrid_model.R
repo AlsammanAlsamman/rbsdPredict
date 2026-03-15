@@ -92,11 +92,27 @@ train_hybrid_model <- function(data, n_clusters = 3, seed = 123) {
                                              data_with_clusters$tmin, data_with_clusters$RH)
   
   # Calculate metrics
-  rmse_A <- Metrics::rmse(data_with_clusters$A, data_with_clusters$predicted_A, na.rm = TRUE)
-  rmse_PDI <- Metrics::rmse(data_with_clusters$PDI, data_with_clusters$predicted_PDI, na.rm = TRUE)
-  
-  r2_A <- cor(data_with_clusters$A, data_with_clusters$predicted_A, use = "complete.obs")^2
-  r2_PDI <- cor(data_with_clusters$PDI, data_with_clusters$predicted_PDI, use = "complete.obs")^2
+  safe_metrics <- function(actual, predicted) {
+    keep <- stats::complete.cases(actual, predicted)
+    actual <- actual[keep]
+    predicted <- predicted[keep]
+
+    if (length(actual) == 0) {
+      return(list(rmse = NA_real_, r2 = NA_real_))
+    }
+
+    rmse <- Metrics::rmse(actual, predicted)
+    r2 <- if (stats::sd(actual) == 0 || stats::sd(predicted) == 0) {
+      NA_real_
+    } else {
+      stats::cor(actual, predicted)^2
+    }
+
+    list(rmse = rmse, r2 = r2)
+  }
+
+  metrics_A <- safe_metrics(data_with_clusters$A, data_with_clusters$predicted_A)
+  metrics_PDI <- safe_metrics(data_with_clusters$PDI, data_with_clusters$predicted_PDI)
   
   # Return results
   result <- list(
@@ -109,8 +125,8 @@ train_hybrid_model <- function(data, n_clusters = 3, seed = 123) {
     predictions = data_with_clusters[, c("A", "PDI", "predicted_A", "predicted_PDI")],
     metrics = data.frame(
       Target = c("A", "PDI"),
-      RMSE = c(rmse_A, rmse_PDI),
-      R2 = c(r2_A, r2_PDI)
+      RMSE = c(metrics_A$rmse, metrics_PDI$rmse),
+      R2 = c(metrics_A$r2, metrics_PDI$r2)
     )
   )
   
@@ -135,10 +151,15 @@ derive_cluster_rules <- function(data, cluster_col, feature_cols) {
     if (nrow(cluster_data) > 0) {
       min_vals <- sapply(cluster_data, min, na.rm = TRUE)
       max_vals <- sapply(cluster_data, max, na.rm = TRUE)
+      mean_vals <- sapply(cluster_data, mean, na.rm = TRUE)
+      sd_vals <- sapply(cluster_data, stats::sd, na.rm = TRUE)
+      sd_vals[is.na(sd_vals) | sd_vals == 0] <- 1
       
       rules[[as.character(cluster_id)]] <- list(
         min = min_vals,
-        max = max_vals
+        max = max_vals,
+        mean = mean_vals,
+        sd = sd_vals
       )
     }
   }
@@ -155,6 +176,7 @@ derive_cluster_rules <- function(data, cluster_col, feature_cols) {
 #' @return Predicted cluster ID
 #' @keywords internal
 predict_cluster_from_rules <- function(tmax, tmin, RH, rules) {
+  # First pass: exact rule-box assignment.
   for (cluster_id in names(rules)) {
     rule <- rules[[cluster_id]]
     
@@ -164,6 +186,14 @@ predict_cluster_from_rules <- function(tmax, tmin, RH, rules) {
       return(as.numeric(cluster_id))
     }
   }
-  
-  return(NA)
+
+  # Fallback: nearest standardized centroid for full coverage.
+  x <- c(tmax = tmax, tmin = tmin, RH = RH)
+  distances <- sapply(names(rules), function(cluster_id) {
+    rule <- rules[[cluster_id]]
+    z <- (x - rule$mean[names(x)]) / rule$sd[names(x)]
+    sqrt(sum(z^2))
+  })
+
+  as.numeric(names(which.min(distances)))
 }

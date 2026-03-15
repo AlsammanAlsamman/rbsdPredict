@@ -10,7 +10,7 @@ evaluate_model(ml_models)
 \item{ml_models}{Trained models from train_ml_models()}
 }
 \value{
-Performance metrics and visualizations
+Performance metrics and visualizations including RMSE, R2, and MAE
 }
 \description{
 Evaluate Machine Learning Models

@@ -92,16 +92,41 @@ plot_actual_vs_predicted <- function(actual, predicted, target = "Target") {
   
   # Calculate R-squared
   r2 <- cor(actual, predicted)^2
+  rmse <- sqrt(mean((actual - predicted)^2))
+  mae <- mean(abs(actual - predicted))
+
+  lower <- min(c(actual, predicted))
+  upper <- max(c(actual, predicted))
+  ann <- paste0("R² = ", round(r2, 3), "\nRMSE = ", round(rmse, 3), "\nMAE = ", round(mae, 3))
   
   # Create plot
-  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = Actual, y = Predicted)) +
-    ggplot2::geom_point(alpha = 0.6) +
-    ggplot2::geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
-    ggplot2::labs(title = paste("Actual vs Predicted", target),
-                 x = "Actual Values", y = "Predicted Values") +
-    ggplot2::annotate("text", x = min(actual), y = max(predicted), 
-                      label = paste("R² =", round(r2, 3)), hjust = 0, vjust = 1) +
-    ggplot2::theme_minimal()
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes_string(x = "Actual", y = "Predicted")) +
+    ggplot2::geom_point(color = "#2b6cb0", alpha = 0.55, size = 2) +
+    ggplot2::geom_smooth(method = "lm", se = FALSE, color = "#2f855a", linewidth = 0.9) +
+    ggplot2::geom_abline(intercept = 0, slope = 1, color = "#c53030", linetype = "dashed", linewidth = 0.8) +
+    ggplot2::coord_equal(xlim = c(lower, upper), ylim = c(lower, upper)) +
+    ggplot2::labs(
+      title = paste("Actual vs Predicted", target),
+      subtitle = "Dashed red line: perfect agreement | Green line: fitted trend",
+      x = "Actual Values",
+      y = "Predicted Values"
+    ) +
+    ggplot2::annotate(
+      "label",
+      x = lower + 0.03 * (upper - lower),
+      y = upper - 0.03 * (upper - lower),
+      label = ann,
+      hjust = 0,
+      vjust = 1,
+      size = 3.4,
+      fill = "white"
+    ) +
+    ggplot2::theme_minimal(base_size = 12) +
+    ggplot2::theme(
+      panel.grid.minor = ggplot2::element_blank(),
+      plot.title = ggplot2::element_text(face = "bold"),
+      plot.subtitle = ggplot2::element_text(color = "#4a5568")
+    )
   
   return(p)
 }

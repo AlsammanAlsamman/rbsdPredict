@@ -1,0 +1,119 @@
+<svg width="1500" height="980" viewBox="0 0 1500 980" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1500" y2="980" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0fdf4"/>
+      <stop offset="0.42" stop-color="#eef2ff"/>
+      <stop offset="1" stop-color="#fff7ed"/>
+    </linearGradient>
+    <linearGradient id="hero2" x1="50" y1="40" x2="1450" y2="170" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="0.45" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#ea580c"/>
+    </linearGradient>
+    <filter id="shadow2" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow2" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0 0L12 6L0 12V0Z" fill="#475569"/>
+    </marker>
+    <style>
+      .title { font: 700 36px 'Segoe UI', Arial, sans-serif; fill: white; }
+      .subtitle { font: 400 16px 'Segoe UI', Arial, sans-serif; fill: rgba(255,255,255,0.9); }
+      .section { font: 700 22px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+      .node-title { font: 700 18px 'Segoe UI', Arial, sans-serif; fill: #0f172a; }
+      .node-text { font: 400 13px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .note { font: 600 12px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+      .edge { stroke: #475569; stroke-width: 3; fill: none; marker-end: url(#arrow2); }
+      .edge-soft { stroke: #94a3b8; stroke-width: 2.5; fill: none; marker-end: url(#arrow2); }
+      .edge-dash { stroke: #64748b; stroke-width: 2.5; stroke-dasharray: 8 8; fill: none; marker-end: url(#arrow2); }
+    </style>
+  </defs>
+
+  <rect width="1500" height="980" rx="28" fill="url(#bg2)"/>
+  <rect x="40" y="36" width="1420" height="122" rx="28" fill="url(#hero2)" filter="url(#shadow2)"/>
+  <text x="74" y="92" class="title">rbsdPredict Workflow Consistent With Current R Implementation</text>
+  <text x="74" y="126" class="subtitle">Standalone exploration functions are separated from the trained-model paths used by prediction and scenario analysis.</text>
+
+  <text x="70" y="210" class="section">A. Data entry</text>
+  <text x="380" y="210" class="section">B. Standalone exploration</text>
+  <text x="760" y="210" class="section">C. Training paths</text>
+  <text x="1190" y="210" class="section">D. Prediction and reporting</text>
+
+  <g filter="url(#shadow2)">
+    <rect x="60" y="250" width="250" height="112" rx="24" fill="#dcfce7" stroke="#22c55e" stroke-width="2.5"/>
+    <text x="84" y="292" class="node-title">Input data</text>
+    <text x="84" y="320" class="node-text">Climate variables:</text>
+    <text x="84" y="342" class="node-text">tmax, tmin, RH, optional RF, PET, WS</text>
+
+    <rect x="60" y="408" width="250" height="136" rx="24" fill="#dbeafe" stroke="#3b82f6" stroke-width="2.5"/>
+    <text x="84" y="450" class="node-title">preprocess_data</text>
+    <text x="84" y="478" class="node-text">Missing values</text>
+    <text x="84" y="500" class="node-text">Feature scaling</text>
+    <text x="84" y="522" class="node-text">Train/test split</text>
+
+    <rect x="370" y="250" width="285" height="120" rx="24" fill="#e0f2fe" stroke="#0284c7" stroke-width="2.5"/>
+    <text x="396" y="292" class="node-title">cluster_analysis</text>
+    <text x="396" y="320" class="node-text">Hierarchical clustering on tmax, tmin, RH</text>
+    <text x="396" y="342" class="node-text">Returns cluster_result for direct exploration</text>
+
+    <rect x="370" y="420" width="285" height="118" rx="24" fill="#fef3c7" stroke="#eab308" stroke-width="2.5"/>
+    <text x="396" y="462" class="node-title">plot_dendrogram</text>
+    <text x="396" y="490" class="node-text">plot_cluster_boxplots</text>
+    <text x="396" y="512" class="node-text">Standalone cluster diagnostics</text>
+
+    <rect x="740" y="250" width="285" height="148" rx="24" fill="#fce7f3" stroke="#db2777" stroke-width="2.5"/>
+    <text x="766" y="292" class="node-title">ML path</text>
+    <text x="766" y="320" class="node-text">train_ml_models(processed_data)</text>
+    <text x="766" y="342" class="node-text">Fits multiple models for A and PDI</text>
+    <text x="766" y="364" class="node-text">Object stores train/test data and metrics</text>
+
+    <rect x="740" y="440" width="285" height="118" rx="24" fill="#fae8ff" stroke="#c026d3" stroke-width="2.5"/>
+    <text x="766" y="482" class="node-title">evaluate_model + rank_models</text>
+    <text x="766" y="510" class="node-text">ML-only comparison, RMSE/R2/MAE</text>
+
+    <rect x="740" y="620" width="285" height="170" rx="24" fill="#ffedd5" stroke="#f97316" stroke-width="2.5"/>
+    <text x="766" y="662" class="node-title">Hybrid path</text>
+    <text x="766" y="690" class="node-text">train_hybrid_model(data)</text>
+    <text x="766" y="712" class="node-text">Internally calls cluster_analysis</text>
+    <text x="766" y="734" class="node-text">Derives rule boxes + centroid fallback</text>
+    <text x="766" y="756" class="node-text">Fits cluster-wise regressions for A and PDI</text>
+
+    <rect x="1110" y="250" width="315" height="120" rx="24" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5"/>
+    <text x="1136" y="292" class="node-title">predict_rbsd</text>
+    <text x="1136" y="320" class="node-text">Works with trained ML or hybrid models</text>
+    <text x="1136" y="342" class="node-text">Predicts A or PDI on newdata</text>
+
+    <rect x="1110" y="430" width="315" height="126" rx="24" fill="#ecfccb" stroke="#84cc16" stroke-width="2.5"/>
+    <text x="1136" y="472" class="node-title">simulate_climate_scenarios</text>
+    <text x="1136" y="500" class="node-text">Works with trained ML or hybrid models</text>
+    <text x="1136" y="522" class="node-text">Scenario grid over dtmax, dtmin, dRH</text>
+
+    <rect x="1110" y="620" width="315" height="150" rx="24" fill="#fff1f2" stroke="#e11d48" stroke-width="2.5"/>
+    <text x="1136" y="662" class="node-title">Reporting outputs</text>
+    <text x="1136" y="690" class="node-text">plot_actual_vs_predicted</text>
+    <text x="1136" y="712" class="node-text">plot_risk_map</text>
+    <text x="1136" y="734" class="node-text">summarize_cluster_equations (hybrid only)</text>
+  </g>
+
+  <path d="M310 306 C 335 306, 340 306, 370 306" class="edge-soft"/>
+  <path d="M185 362 C 185 385, 185 390, 185 408" class="edge"/>
+  <path d="M310 470 C 500 470, 560 332, 740 324" class="edge"/>
+  <path d="M310 490 C 520 490, 600 690, 740 700" class="edge"/>
+  <path d="M655 308 C 695 308, 700 308, 740 308" class="edge-dash"/>
+  <path d="M655 310 C 695 310, 700 680, 740 680" class="edge-dash"/>
+  <path d="M1025 308 C 1065 308, 1070 308, 1110 308" class="edge"/>
+  <path d="M1025 500 C 1070 500, 1080 470, 1110 470" class="edge-soft"/>
+  <path d="M1025 710 C 1070 710, 1080 690, 1110 690" class="edge"/>
+  <path d="M1268 370 C 1268 394, 1268 404, 1268 430" class="edge-soft"/>
+  <path d="M1268 556 C 1268 584, 1268 590, 1268 620" class="edge-soft"/>
+  <path d="M1025 730 C 1070 730, 1082 732, 1110 732" class="edge-soft"/>
+
+  <circle cx="337" cy="306" r="6.5" fill="#475569"/>
+  <circle cx="530" cy="470" r="6.5" fill="#475569"/>
+  <circle cx="1072" cy="308" r="6.5" fill="#475569"/>
+  <circle cx="1072" cy="698" r="6.5" fill="#475569"/>
+
+  <text x="66" y="860" class="note">Implementation notes: ML evaluation helpers are downstream of train_ml_models only. Hybrid equations are extracted downstream of train_hybrid_model. Standalone clustering plots can be called independently or from hybrid$cluster_result.</text>
+  <text x="66" y="888" class="note">Shared downstream functions: predict_rbsd and simulate_climate_scenarios accept either trained ML or hybrid model objects.</text>
+  <text x="66" y="916" class="note">Visual language: green = input, blue/yellow = preparation and exploration, magenta/orange = training engines, purple/green/red = shared outputs and reporting.</text>
+</svg>
